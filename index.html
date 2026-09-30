@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>WEDAI — مخطط الزواج الذكي</title>
+  <style>
+    :root{
+      --bg:#fff9fb;
+      --card:#ffffff;
+      --text:#241d22;
+      --muted:#746a71;
+      --primary:#b65b7b;
+      --primary-2:#e7a9bd;
+      --accent:#8b6a78;
+      --line:#eedde4;
+      --ok:#2c8b66;
+      --danger:#b74a55;
+      --shadow:0 18px 55px rgba(99, 59, 76, .12);
+      --radius:24px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Tahoma, Arial, sans-serif;
+      background:
+        radial-gradient(circle at top right, rgba(231,169,189,.24), transparent 28%),
+        radial-gradient(circle at bottom left, rgba(182,91,123,.12), transparent 30%),
+        var(--bg);
+      color:var(--text);
+      min-height:100vh;
+    }
+    .wrap{max-width:1100px;margin:auto;padding:28px 18px 64px}
+    .topbar{
+      display:flex;align-items:center;justify-content:space-between;gap:16px;
+      padding:12px 4px 28px;
+    }
+    .brand{display:flex;align-items:center;gap:12px;font-weight:800;font-size:22px}
+    .logo{
+      width:48px;height:48px;border-radius:15px;display:grid;place-items:center;
+      background:linear-gradient(135deg,var(--primary),var(--primary-2));
+      color:white;box-shadow:0 10px 25px rgba(182,91,123,.3);font-size:24px
+    }
+    .badge{
+      padding:8px 12px;border:1px solid var(--line);border-radius:999px;
+      background:rgba(255,255,255,.65);color:var(--muted);font-size:13px
+    }
+    .hero{
+      display:grid;grid-template-columns:1.05fr .95fr;gap:28px;align-items:stretch;
+    }
+    .intro,.panel{
+      background:rgba(255,255,255,.82);
+      border:1px solid rgba(238,221,228,.9);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+    .intro{
+      padding:42px;
+      display:flex;flex-direction:column;justify-content:center;min-height:560px
+    }
+    .eyebrow{color:var(--primary);font-weight:800;margin-bottom:12px}
+    h1{font-size:clamp(36px,6vw,68px);line-height:1.02;margin:0 0 18px}
+    .lead{font-size:18px;line-height:1.9;color:var(--muted);max-width:650px}
+    .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:28px}
+    .step{
+      border:1px solid var(--line);background:#fff;border-radius:18px;padding:16px
+    }
+    .step strong{display:block;margin-bottom:5px}
+    .step span{font-size:13px;color:var(--muted)}
+    .panel{padding:28px}
+    .panel h2{margin:0 0 8px;font-size:28px}
+    .sub{color:var(--muted);margin:0 0 24px}
+    form{display:grid;gap:16px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    label{display:block;font-weight:700;margin-bottom:7px;font-size:14px}
+    input,select{
+      width:100%;padding:14px 15px;border:1px solid var(--line);border-radius:14px;
+      background:#fff;color:var(--text);font-size:15px;outline:none;
+      transition:.2s ease;
+    }
+    input:focus,select:focus{
+      border-color:var(--primary-2);
+      box-shadow:0 0 0 4px rgba(182,91,123,.09)
+    }
+    .citybox{
+      background:#fff5f8;border:1px dashed var(--primary-2);border-radius:14px;
+      padding:13px 15px;color:var(--accent);font-weight:700
+    }
+    button{
+      border:0;border-radius:14px;padding:14px 18px;font-size:15px;font-weight:800;
+      cursor:pointer;transition:.2s ease
+    }
+    .primary{
+      color:white;background:linear-gradient(135deg,var(--primary),#cf7796);
+      box-shadow:0 10px 24px rgba(182,91,123,.25)
+    }
+    .primary:hover{transform:translateY(-1px)}
+    .primary:disabled{opacity:.55;cursor:not-allowed;transform:none}
+    .result{
+      margin-top:26px;background:rgba(255,255,255,.9);border:1px solid var(--line);
+      border-radius:var(--radius);box-shadow:var(--shadow);padding:28px;display:none
+    }
+    .result.show{display:block}
+    .result-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .result pre{
+      white-space:pre-wrap;word-break:break-word;font-family:inherit;line-height:1.9;
+      background:#fffafb;border:1px solid var(--line);border-radius:16px;padding:20px;
+      font-size:15px
+    }
+    .actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px}
+    .approve{background:#eaf7f1;color:var(--ok);border:1px solid #cdeadd}
+    .reject{background:#fff0f1;color:var(--danger);border:1px solid #f2cfd3}
+    .status{margin-top:14px;padding:12px 14px;border-radius:12px;display:none}
+    .status.show{display:block}
+    .status.ok{background:#eaf7f1;color:var(--ok)}
+    .status.no{background:#fff0f1;color:var(--danger)}
+    .loading{
+      display:none;align-items:center;gap:10px;color:var(--muted);font-weight:700
+    }
+    .loading.show{display:flex}
+    .spinner{
+      width:18px;height:18px;border:3px solid #efd8e1;border-top-color:var(--primary);
+      border-radius:50%;animation:spin .8s linear infinite
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .note{
+      margin-top:18px;font-size:12px;color:var(--muted);line-height:1.7;
+      border-top:1px solid var(--line);padding-top:16px
+    }
+    @media(max-width:850px){
+      .hero{grid-template-columns:1fr}
+      .intro{min-height:auto;padding:30px}
+    }
+    @media(max-width:560px){
+      .grid,.steps{grid-template-columns:1fr}
+      .panel{padding:20px}
+      .intro{padding:24px}
+      .topbar{align-items:flex-start}
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo">💍</div>
+        <div>WEDAI</div>
+      </div>
+      <div class="badge">AI Wedding Planner · MVP</div>
+    </div>
+
+    <section class="hero">
+      <article class="intro">
+        <div class="eyebrow">خطتك، ميزانيتك، ذوقك.</div>
+        <h1>زواجك يبدأ<br>بخطة أذكى.</h1>
+        <p class="lead">
+          أدخلي ميزانيتك وعدد الضيوف والتاريخ والستايل، وWEDAI ينسّق لكِ خطة زواج متكاملة
+          باستخدام موردين مناسبين، ثم يحسب التكلفة ويعرضها لك للموافقة.
+        </p>
+        <div class="steps">
+          <div class="step"><strong>1. ندخل المتطلبات</strong><span>الميزانية، الضيوف، التاريخ والستايل</span></div>
+          <div class="step"><strong>2. WEDAI يخطط</strong><span>يبحث في الموردين ويحسب التكلفة</span></div>
+          <div class="step"><strong>3. أنتِ تقررين</strong><span>موافقة بشرية قبل أي خطوة نهائية</span></div>
+        </div>
+      </article>
+
+      <section class="panel">
+        <h2>ابني خطتك</h2>
+        <p class="sub">نسخة تجريبية مخصصة لمدينة جدة.</p>
+
+        <form id="weddingForm">
+          <div>
+            <label>المدينة</label>
+            <div class="citybox">جدة</div>
+          </div>
+
+          <div class="grid">
+            <div>
+              <label for="budget">الميزانية بالريال</label>
+              <input id="budget" name="budget" type="number" min="1000" step="500" placeholder="مثال: 80000" required>
+            </div>
+            <div>
+              <label for="guests">عدد الضيوف</label>
+              <input id="guests" name="guests" type="number" min="1" step="1" placeholder="مثال: 250" required>
+            </div>
+          </div>
+
+          <div>
+            <label for="wedding_date">تاريخ الزواج</label>
+            <input id="wedding_date" name="wedding_date" type="date" required>
+          </div>
+
+          <div>
+            <label for="style">الستايل المطلوب</label>
+            <select id="style" name="style" required>
+              <option value="">اختاري الستايل</option>
+              <option value="مودرن">مودرن</option>
+              <option value="كلاسيك">كلاسيك</option>
+              <option value="فاخر">فاخر</option>
+              <option value="بسيط">بسيط</option>
+            </select>
+          </div>
+
+          <button class="primary" id="submitBtn" type="submit">✨ أنشئي خطة WEDAI</button>
+          <div class="loading" id="loading"><span class="spinner"></span> جاري بناء الخطة...</div>
+        </form>
+
+        <div class="note">
+          ملاحظة: ضعي رابط Webhook الخاص بـ n8n داخل الملف في المتغير
+          <b>PLAN_WEBHOOK_URL</b> قبل الاستخدام.
+        </div>
+      </section>
+    </section>
+
+    <section class="result" id="resultBox">
+      <div class="result-head">
+        <div>
+          <div class="eyebrow">الخطة المقترحة</div>
+          <h2 style="margin:0">خطة WEDAI 💍</h2>
+        </div>
+      </div>
+      <pre id="planText"></pre>
+      <div class="actions">
+        <button class="approve" id="approveBtn" type="button">✅ موافقة على الخطة</button>
+        <button class="reject" id="rejectBtn" type="button">✏️ غير موافقة</button>
+      </div>
+      <div class="status" id="statusBox"></div>
+    </section>
+  </main>
+
+  <script>
+    // 1) ضعي هنا Production Webhook URL من n8n
+    const PLAN_WEBHOOK_URL = "PASTE_YOUR_N8N_PLAN_WEBHOOK_URL_HERE";
+
+    // 2) اختياري: Webhook ثاني لتسجيل موافق/غير موافق في n8n
+    const APPROVAL_WEBHOOK_URL = "PASTE_YOUR_N8N_APPROVAL_WEBHOOK_URL_HERE";
+
+    const form = document.getElementById("weddingForm");
+    const loading = document.getElementById("loading");
+    const submitBtn = document.getElementById("submitBtn");
+    const resultBox = document.getElementById("resultBox");
+    const planText = document.getElementById("planText");
+    const statusBox = document.getElementById("statusBox");
+
+    let lastPlan = "";
+
+    function extractPlan(data) {
+      if (typeof data === "string") return data;
+      if (data?.output) return data.output;
+      if (data?.plan) return data.plan;
+      if (data?.data?.output) return data.data.output;
+      return JSON.stringify(data, null, 2);
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      if (PLAN_WEBHOOK_URL.includes("PASTE_YOUR")) {
+        alert("أضيفي رابط Webhook الخاص بـ n8n داخل PLAN_WEBHOOK_URL أولاً.");
+        return;
+      }
+
+      const payload = {
+        city: "جدة",
+        budget: Number(document.getElementById("budget").value),
+        guests: Number(document.getElementById("guests").value),
+        wedding_date: document.getElementById("wedding_date").value,
+        style: document.getElementById("style").value
+      };
+
+      loading.classList.add("show");
+      submitBtn.disabled = true;
+      statusBox.className = "status";
+      resultBox.classList.remove("show");
+
+      try {
+        const res = await fetch(PLAN_WEBHOOK_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        const contentType = res.headers.get("content-type") || "";
+        const data = contentType.includes("application/json")
+          ? await res.json()
+          : await res.text();
+
+        if (!res.ok) throw new Error(extractPlan(data));
+
+        lastPlan = extractPlan(data);
+        planText.textContent = lastPlan;
+        resultBox.classList.add("show");
+        resultBox.scrollIntoView({ behavior: "smooth", block: "start" });
+      } catch (err) {
+        alert("تعذر إنشاء الخطة.\n\n" + (err?.message || err));
+      } finally {
+        loading.classList.remove("show");
+        submitBtn.disabled = false;
+      }
+    });
+
+    async function sendApproval(approval) {
+      statusBox.className = "status show";
+      statusBox.textContent = approval === "موافق"
+        ? "تم اعتماد الخطة ✅"
+        : "لم يتم اعتماد الخطة. يمكنك تعديل البيانات وتجربة خطة أخرى.";
+
+      statusBox.classList.add(approval === "موافق" ? "ok" : "no");
+
+      if (!APPROVAL_WEBHOOK_URL || APPROVAL_WEBHOOK_URL.includes("PASTE_YOUR")) return;
+
+      try {
+        await fetch(APPROVAL_WEBHOOK_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            approval,
+            plan: lastPlan,
+            timestamp: new Date().toISOString()
+          })
+        });
+      } catch (e) {
+        console.warn("Approval webhook failed:", e);
+      }
+    }
+
+    document.getElementById("approveBtn").addEventListener("click", () => sendApproval("موافق"));
+    document.getElementById("rejectBtn").addEventListener("click", () => sendApproval("غير موافق"));
+  </script>
+</body>
+</html>
